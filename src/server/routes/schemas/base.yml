@@ -1,0 +1,159 @@
+swagger: "2.0"
+info:
+  description: Hydra server
+  version: 0.0.1
+  title: Hydra server
+  license:
+    name: MIT
+basePath: "/api"
+tags:
+  - name: Clients
+    description: Client management tools
+  - name: Jobs
+    description: Tasks for the server to run and broadcast
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - "https"
+  - "http"
+paths:
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: Get a listing of all registered clients
+      operationId: server.routes.controllers.clients.lst_clients
+      responses:
+        200:
+          description: A listing of registered clients was returned
+    post:
+      tags:
+        - Clients
+      summary: Add a client to the registry
+      operationId: server.routes.controllers.clients.add_client
+      parameters:
+        - name: client
+          in: body
+          required: true
+          description: Client information to add
+          schema:
+            $ref: '#/definitions/client'
+      responses:
+        200:
+          description: Successfully added client to registry
+  /clients/{client_name}:
+    delete:
+      tags:
+        - Clients
+      summary: Given a client name, remove it from the registry
+      operationId: server.routes.controllers.clients.remove_client
+      parameters:
+        - name: client_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successfully removed client from registry
+  /clients/{client_name}/report:
+    post:
+      tags:
+        - Clients
+      summary: Clients report back their status here.  Used to let the analyst know when something is done.
+      operationId: server.routes.controllers.clients.report_status
+      parameters:
+        - name: client_name
+          in: path
+          required: true
+          type: string
+        - name: status
+          in: query
+          required: true
+          description: Client status to report
+          type: string
+      responses:
+        200:
+          description: Successfully recieved status report from client
+  /tasks:
+    get:
+      tags:
+        - Jobs
+      summary: Get a list of available tasks
+      operationId: server.routes.controllers.tasks.list_tasks
+      responses:
+        200:
+          description: Successfully retrieved list of available tasks
+  /tasks/{task_name}:
+    post:
+      tags:
+        - Jobs
+      summary: Start a given task
+      operationId: server.routes.controllers.tasks.start_task
+      parameters:
+        - name: task_name
+          in: path
+          required: true
+          type: string
+          enum:
+            - INIT
+            - QC
+            - PCA
+            - ASSO
+        - name: thresholds
+          in: body
+          description: "Use this field to specify thresholds and other parameters. WARNING: Just because you 
+          havent' specified a threshold, doesn't mean the filter isn't happening. Checkout the defaults." 
+          required: false
+          schema:
+            type: object
+            additionalProperties: true
+      responses:
+        200:
+          description: Successfully started task
+  /tasks/{task_name}/{subtask_name}:
+    post:
+      tags:
+        - Jobs
+      summary: Start a given subtask
+      operationId: server.routes.controllers.tasks.start_subtask
+      parameters:
+        - name: task_name
+          in: path
+          required: true
+          type: string
+          enum:
+            - INIT
+            - QC
+            - PCA
+            - ASSO
+        - name: subtask_name
+          in: path
+          required: true
+          type: string
+        - name: client_name
+          in: query
+          type: string
+          required: true
+        - name: p_name
+          in: query
+          type: string
+          required: false
+          description: Key-value pairs of any parameters needed to pass into the given subtask.  Keys must begin with `p_`, e.g. `/tasks/A/B?p_threshold=1%26p_sensitivity=.5`.  Note we have url-encoded the ampersand.
+      responses:
+        200:
+          description: Successfully started subtask
+definitions:
+  client:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Unique name of the client
+      port:
+        type: number
+        description: Port on which the client listens
+      host:
+        type: string
+        description: Address on which the client listens

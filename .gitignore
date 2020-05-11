@@ -1,0 +1,9 @@
+.idea/
+.vagrant/
+__pycache__/
+commitfile
+testData/*.gz
+testData/*.gz.*
+testData/*.vcf
+generated.api.yml
+
