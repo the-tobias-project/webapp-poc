@@ -6,7 +6,7 @@ name: Build and deploy Python app to Azure Web App - dev-hydra-hub
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   build-and-deploy:
