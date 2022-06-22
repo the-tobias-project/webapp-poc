@@ -7,7 +7,7 @@ flask==1.0.2
 h5py==2.8.0
 jsonschema==2.6.0
 numba==0.40.0
-numpy==1.15.2
+numpy==1.22.0
 pandas==0.24.1
 plinkio==0.9.6
 kombu==4.5.0
